@@ -73,7 +73,10 @@
 
 <div class="sidebar d-none d-md-block border-end shadow-sm">
     <nav class="nav flex-column">
-        <a class="nav-link active" href="#"><i class="bi bi-house-door me-3"></i> Accueil</a>
+       <a class="nav-link active" href="{{ route('videos.index') }}"><i class="bi bi-house-door me-3"></i> Accueil</a>
+        <a class="nav-link text-danger fw-bold" href="{{ route('admin.videos.create') }}">
+            <i class="bi bi-plus-circle-fill me-3"></i> Mettre en ligne
+        </a>
         <a class="nav-link" href="#"><i class="bi bi-collection-play me-3"></i> Abonnements</a>
         <hr>
         <p class="text-muted small ps-3 fw-bold mb-1">Catégories</p>
