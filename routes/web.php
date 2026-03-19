@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VideoController;
+use App\Http\Controllers\Admin\VideoController as AdminVideoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,3 +20,7 @@ use App\Http\Controllers\VideoController;
 
 Route::get('/', [VideoController::class, 'index'])->name('videos.index');
 Route::get('/watch/{slug}', [VideoController::class, 'show'])->name('videos.show');
+
+
+Route::get('/admin/videos/create', [AdminVideoController::class, 'create'])->name('admin.videos.create');
+Route::post('/admin/videos', [AdminVideoController::class, 'store'])->name('admin.videos.store');
