@@ -18,3 +18,4 @@ use App\Http\Controllers\VideoController;
 
 
 Route::get('/', [VideoController::class, 'index'])->name('videos.index');
+Route::get('/watch/{slug}', [VideoController::class, 'show'])->name('videos.show');

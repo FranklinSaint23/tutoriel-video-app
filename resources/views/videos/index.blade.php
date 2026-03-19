@@ -89,7 +89,9 @@
         <div class="col-xl-4 col-lg-4 col-md-6 mb-4">
             <div class="card border-0 bg-transparent">
                 <div class="video-thumbnail">
-                    <img src="{{ $video->thumbnail_url }}" alt="{{ $video->title }}">
+                    <a href="{{ route('videos.show', $video->slug) }}" class="video-title d-block">
+                        <img src="{{ $video->thumbnail_url }}" alt="{{ $video->title }}">
+                    </a>
                     <span class="duration">12:45</span>
                 </div>
                 <div class="card-body p-0">
@@ -98,7 +100,9 @@
                             <div class="bg-secondary rounded-circle" style="width: 36px; height: 36px;"></div>
                         </div>
                         <div>
-                            <a href="#" class="video-title d-block">{{ $video->title }}</a>
+                            <a href="{{ route('videos.show', $video->slug) }}" class="video-title d-block">
+                                {{ $video->title }}
+                            </a>
                             <div class="video-meta">
                                 <div>{{ $video->category->name }} • <span class="badge bg-light text-dark border">{{ $video->level }}</span></div>
                                 <div>1.2k vues • il y a 2 jours</div>

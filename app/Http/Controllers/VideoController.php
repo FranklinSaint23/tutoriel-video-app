@@ -28,4 +28,18 @@ class VideoController extends Controller
 
         return view('videos.index', compact('videos'));
     }
+
+    public function show(string $slug): View
+    {
+        // On récupère la vidéo via son slug avec sa catégorie
+        $video = Video::where('slug', $slug)->where('is_published', true)->firstOrFail();
+        
+        // On récupère quelques suggestions (vidéos de la même catégorie)
+        $suggestions = Video::where('category_id', $video->category_id)
+            ->where('id', '!=', $video->id)
+            ->limit(5)
+            ->get();
+
+        return view('videos.show', compact('video', 'suggestions'));
+    }
 }
