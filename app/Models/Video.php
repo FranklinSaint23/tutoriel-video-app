@@ -13,7 +13,7 @@ class Video extends Model
 
     protected $fillable = [
         'title', 'slug', 'description', 'video_url', 
-        'thumbnail_url', 'level', 'category_id', 'user_id'
+        'thumbnail_url', 'level', 'category_id', 'user_id', 'is_published'
     ];
 
     /**
