@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Video extends Model
 {
-    use SoftDeletes; // Active la suppression douce
+    use HasFactory, SoftDeletes; // Active la suppression douce
 
     protected $fillable = [
         'title', 'slug', 'description', 'video_url', 
