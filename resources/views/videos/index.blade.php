@@ -44,14 +44,18 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
     <div class="container-fluid px-4">
         <a class="navbar-brand d-flex align-items-center" href="#">
-            <i class="bi bi-play-btn-fill text-danger fs-3 me-2"></i>
+            <i class="bi bi-play-btn-fill text-primary fs-3 me-2"></i>
             <span class="fw-bold border-1">SAINT TUTOS</span>
         </a>
         
-        <form class="d-flex mx-auto" style="width: 50%; max-width: 600px;">
+        <form action="{{ route('videos.index') }}" method="GET" class="d-flex mx-auto" style="width: 50%; max-width: 600px;">
             <div class="input-group">
-                <input type="text" class="form-control rounded-start-pill ps-4" placeholder="Rechercher un tutoriel...">
-                <button class="btn btn-outline-secondary rounded-end-pill px-4 bg-light" type="button">
+                <input type="text" 
+                    name="search" 
+                    value="{{ request('search') }}" 
+                    class="form-control rounded-start-pill ps-4" 
+                    placeholder="Rechercher un tutoriel...">
+                <button class="btn btn-outline-secondary rounded-end-pill px-4 bg-light" type="submit">
                     <i class="bi bi-search"></i>
                 </button>
             </div>
