@@ -68,6 +68,19 @@
                 F
             </div>
         </div>
+        <div class="d-flex align-items-center">
+            @auth
+                <i class="bi bi-camera-video fs-4 me-4"></i>
+                <span class="me-3 fw-bold">{{ Auth::user()->name }}</span>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">Déconnexion</button>
+                </form>
+            @else
+                <a href="{{ route('login') }}" class="btn btn-outline-primary rounded-pill me-2">Connexion</a>
+                <a href="{{ route('register') }}" class="btn btn-primary rounded-pill">S'inscrire</a>
+            @endauth
+        </div>
     </div>
 </nav>
 
