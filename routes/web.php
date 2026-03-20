@@ -27,3 +27,4 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+Route::post('/videos/{video}/like', [VideoController::class, 'toggleLike'])->name('videos.like')->middleware('auth');

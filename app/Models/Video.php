@@ -31,4 +31,9 @@ class Video extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function likedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'video_user')->withTimestamps();
+    }
 }

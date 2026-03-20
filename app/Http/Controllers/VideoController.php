@@ -44,4 +44,12 @@ class VideoController extends Controller
 
         return view('videos.show', compact('video', 'suggestions'));
     }
+
+   public function toggleLike(Video $video)
+    {
+        // toggle() ajoute si absent, retire si présent. Magique !
+        auth()->user()->likedVideos()->toggle($video->id);
+
+        return back();
+    }
 }
