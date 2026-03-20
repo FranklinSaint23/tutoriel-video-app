@@ -1,141 +1,71 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saint Tutos - Vidéo Platform</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <style>
-        body { background-color: #f9f9f9; }
-        /* Barre latérale fixe */
-        .sidebar {
-            position: fixed; top: 56px; left: 0; bottom: 0;
-            width: 240px; background: white; padding: 12px;
-            overflow-y: auto; z-index: 1000;
-        }
-        .main-content { margin-left: 240px; padding-top: 80px; }
-        .nav-link { color: #0f0f0f; border-radius: 10px; margin-bottom: 2px; }
-        .nav-link:hover, .nav-link.active { background-color: #f2f2f2; font-weight: 500; }
-        
-        /* Style des vignettes YouTube */
-        .video-thumbnail {
-            position: relative; border-radius: 12px; overflow: hidden;
-            aspect-ratio: 16/9; background: #000;
-        }
-        .video-thumbnail img { width: 100%; height: 100%; object-fit: cover; }
-        .duration {
-            position: absolute; bottom: 8px; right: 8px;
-            background: rgba(0,0,0,0.8); color: white;
-            padding: 2px 4px; font-size: 12px; border-radius: 4px;
-        }
-        .video-title {
-            font-size: 16px; font-weight: 600; line-height: 1.4;
-            display: -webkit-box; -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical; overflow: hidden;
-            margin-top: 10px; color: #0f0f0f; text-decoration: none;
-        }
-        .video-meta { font-size: 14px; color: #606060; }
-        .navbar { z-index: 1001; }
-    </style>
-</head>
-<body>
-
-<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
-    <div class="container-fluid px-4">
-        <a class="navbar-brand d-flex align-items-center" href="#">
-            <i class="bi bi-play-btn-fill text-primary fs-3 me-2"></i>
-            <span class="fw-bold border-1">SAINT TUTOS</span>
-        </a>
-        
-        <form action="{{ route('videos.index') }}" method="GET" class="d-flex mx-auto" style="width: 50%; max-width: 600px;">
-            <div class="input-group">
-                <input type="text" 
-                    name="search" 
-                    value="{{ request('search') }}" 
-                    class="form-control rounded-start-pill ps-4" 
-                    placeholder="Rechercher un tutoriel...">
-                <button class="btn btn-outline-secondary rounded-end-pill px-4 bg-light" type="submit">
-                    <i class="bi bi-search"></i>
-                </button>
-            </div>
-        </form>
-
-        <div class="d-flex align-items-center">
-            <i class="bi bi-camera-video fs-4 me-4"></i>
-            <i class="bi bi-bell fs-4 me-4"></i>
-            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow" style="width: 35px; height: 35px;">
-                F
-            </div>
-        </div>
-        <div class="d-flex align-items-center">
-            @auth
-                <i class="bi bi-camera-video fs-4 me-4"></i>
-                <span class="me-3 fw-bold">{{ Auth::user()->name }}</span>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">Déconnexion</button>
-                </form>
-            @else
-                <a href="{{ route('login') }}" class="btn btn-outline-primary rounded-pill me-2">Connexion</a>
-                <a href="{{ route('register') }}" class="btn btn-primary rounded-pill">S'inscrire</a>
-            @endauth
-        </div>
-    </div>
-</nav>
-
-<div class="sidebar d-none d-md-block border-end shadow-sm">
-    <nav class="nav flex-column">
-       <a class="nav-link active" href="{{ route('videos.index') }}"><i class="bi bi-house-door me-3"></i> Accueil</a>
-        <a class="nav-link text-danger fw-bold" href="{{ route('admin.videos.create') }}">
-            <i class="bi bi-plus-circle-fill me-3"></i> Mettre en ligne
-        </a>
-        <a class="nav-link" href="#"><i class="bi bi-collection-play me-3"></i> Abonnements</a>
-        <hr>
-        <p class="text-muted small ps-3 fw-bold mb-1">Catégories</p>
-        <a class="nav-link" href="#"><i class="bi bi-code-slash me-3"></i> Programmation</a>
-        <a class="nav-link" href="#"><i class="bi bi-palette me-3"></i> Design</a>
-        <a class="nav-link" href="#"><i class="bi bi-database me-3"></i> Big Data</a>
-    </nav>
-</div>
-
-<div class="main-content px-4">
-    <div class="row">
-        @foreach($videos as $video)
-        <div class="col-xl-4 col-lg-4 col-md-6 mb-4">
-            <div class="card border-0 bg-transparent">
-                <div class="video-thumbnail">
-                    <a href="{{ route('videos.show', $video->slug) }}" class="video-title d-block">
-                        <img src="{{ $video->thumbnail_url }}" alt="{{ $video->title }}">
-                    </a>
-                    <span class="duration">12:45</span>
+<x-app-layout>
+    <div class="py-12 bg-gray-950 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
+                <div>
+                    <h1 class="text-4xl font-black text-white mb-2">Découvrir les <span class="text-indigo-500">Tutos</span></h1>
+                    <p class="text-gray-400">Apprends le développement avec des experts passionnés.</p>
                 </div>
-                <div class="card-body p-0">
-                    <div class="d-flex mt-2">
-                        <div class="me-3">
-                            <div class="bg-secondary rounded-circle" style="width: 36px; height: 36px;"></div>
-                        </div>
-                        <div>
-                            <a href="{{ route('videos.show', $video->slug) }}" class="video-title d-block">
-                                {{ $video->title }}
-                            </a>
-                            <div class="video-meta">
-                                <div>{{ $video->category->name }} • <span class="badge bg-light text-dark border">{{ $video->level }}</span></div>
-                                <div>1.2k vues • il y a 2 jours</div>
+
+                <form action="{{ route('videos.index') }}" method="GET" class="relative w-full md:w-96">
+                    <input type="text" name="search" value="{{ request('search') }}" 
+                        placeholder="Que veux-tu apprendre aujourd'hui ?"
+                        class="w-full bg-gray-900 border-gray-800 text-white rounded-full pl-5 pr-12 py-3 focus:ring-2 focus:ring-indigo-500 transition-all">
+                    <button type="submit" class="absolute right-3 top-2 text-gray-500 hover:text-white">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </button>
+                </form>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                @forelse($videos as $video)
+                    <div class="group cursor-pointer">
+                        {{-- Image de la vidéo avec effet de zoom --}}
+                        <a href="{{ route('videos.show', $video->slug) }}" class="block relative overflow-hidden rounded-2xl aspect-video border border-gray-800 bg-gray-900 mb-3">
+                            <img src="{{ $video->thumbnail_url }}" 
+                                class="w-full h-full object-cover transition duration-500 group-hover:scale-110" 
+                                alt="{{ $video->title }}">
+                            
+                            {{-- Overlay Play au survol --}}
+                            <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <div class="bg-indigo-600 p-4 rounded-full text-white shadow-xl transform scale-75 group-hover:scale-100 transition-transform duration-300">
+                                    <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                </div>
+                            </div>
+
+                            <span class="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] px-2 py-1 rounded font-bold uppercase tracking-tighter">
+                                {{ $video->level }}
+                            </span>
+                        </a>
+
+                        {{-- Infos sous la vidéo --}}
+                        <div class="px-1">
+                            <div class="flex items-start gap-3">
+                                {{-- Avatar fictif ou initiales --}}
+                                <div class="w-10 h-10 rounded-full bg-indigo-900/50 flex-shrink-0 flex items-center justify-center text-indigo-400 font-bold text-xs border border-indigo-500/30">
+                                    {{ substr($video->user->name, 0, 2) }}
+                                </div>
+                                <div>
+                                    <h3 class="text-white font-bold text-sm leading-tight line-clamp-2 group-hover:text-indigo-400 transition">
+                                        {{ $video->title }}
+                                    </h3>
+                                    <p class="text-gray-500 text-xs mt-1">{{ $video->user->name }} • {{ $video->category->name }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                @empty
+                    <div class="col-span-full py-20 text-center">
+                        <p class="text-gray-500 text-lg italic">Aucun tutoriel ne correspond à ta recherche pour le moment.</p>
+                    </div>
+                @endforelse
             </div>
+
+            <div class="mt-16 text-gray-400">
+                {{ $videos->links() }}
+            </div>
+
         </div>
-        @endforeach
     </div>
-
-    <div class="d-flex justify-content-center py-4">
-        {{ $videos->links('pagination::bootstrap-5') }}
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</x-app-layout>
