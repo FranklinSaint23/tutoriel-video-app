@@ -9,9 +9,14 @@
                         <span class="w-2 h-6 bg-indigo-500 rounded-full"></span>
                         Mes Tutoriels Mis en Ligne
                     </h3>
-                    <a href="{{ route('admin.videos.create') }}" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-lg transition">
+                    <div class="flex gap-2">
+                    <a href="{{ route('videos.create') }}" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-lg transition">
                         + Nouvel Upload
                     </a>
+                    <a href="{{ route('videos.index') }}" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-bold rounded-lg transition">
+                        Découvrir tutos
+                    </a>
+                    </div>
                 </div>
 
                 @if($myVideos->isEmpty())
@@ -26,7 +31,7 @@
                                 {{-- 1. Overlay d'actions (Apparaît au survol) --}}
                                 <div class="absolute top-3 right-3 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                     {{-- Bouton Modifier --}}
-                                    <a href="{{ route('admin.videos.edit', $video->id) }}" 
+                                    <a href="{{ route('videos.edit', $video->id) }}" 
                                     class="p-2 bg-blue-600/90 hover:bg-blue-500 text-white rounded-lg shadow-lg backdrop-blur-sm transition"
                                     title="Modifier ce tuto">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,7 +40,7 @@
                                     </a>
 
                                     {{-- Bouton Supprimer (Formulaire pour la sécurité) --}}
-                                    <form action="{{ route('admin.videos.destroy', $video->id) }}" method="POST" onsubmit="return confirm('Es-tu sûr de vouloir supprimer ce tutoriel ?');">
+                                    <form action="{{ route('videos.destroy', $video->id) }}" method="POST" onsubmit="return confirm('Es-tu sûr de vouloir supprimer ce tutoriel ?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" 

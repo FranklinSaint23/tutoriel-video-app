@@ -17,7 +17,7 @@
                     <p class="text-indigo-100 text-sm opacity-80">Mettez à jour les informations de votre cours en quelques clics.</p>
                 </div>
 
-                <form action="{{ route('admin.videos.update', $video) }}" method="POST" class="p-8 space-y-6">
+                <form action="{{ route('videos.update', $video) }}" method="POST" class="p-8 space-y-6">
                     @csrf
                     @method('PUT')
 
