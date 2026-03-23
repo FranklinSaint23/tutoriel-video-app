@@ -30,4 +30,6 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 Route::post('/videos/{video}/like', [VideoController::class, 'toggleLike'])->name('videos.like')->middleware('auth');
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard'); // <-- C'est ce nom qui manquait !

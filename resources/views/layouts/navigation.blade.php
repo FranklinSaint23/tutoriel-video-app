@@ -4,7 +4,7 @@
         <div class="flex justify-between h-16">
             <div class="flex">
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('admin.videos.index') }}">
+                    <a href="#">
                         {{-- text-white pour que ton nouveau logo play soit visible --}}
                         <x-application-logo class="block h-9 w-auto fill-current text-indigo-500" />
                     </a>
@@ -35,6 +35,14 @@
                         {{-- Les liens du dropdown s'adapteront car ce sont des composants Breeze --}}
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Mon Profil') }}
+                        </x-dropdown-link>
+
+                        <x-dropdown-link :href="route('dashboard')">
+                            {{ __('Mon Dashboard') }}
+                        </x-dropdown-link>
+
+                        <x-dropdown-link :href="route('admin.videos.index')">
+                            {{ __('Gérer mes vidéos') }}
                         </x-dropdown-link>
 
                         <form method="POST" action="{{ route('logout') }}">

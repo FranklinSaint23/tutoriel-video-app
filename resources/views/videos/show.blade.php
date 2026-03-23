@@ -27,22 +27,37 @@
                             </h1>
                             
                             <div class="flex items-center gap-3">
-                                {{-- Bouton de Vote (Like) --}}
-                                <form action="{{ route('videos.like', $video) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" 
-                                        class="flex items-center gap-2 px-5 py-2.5 rounded-full transition-all duration-300 border {{ auth()->user() && auth()->user()->likedVideos->contains($video->id) ? 'bg-red-600/10 text-red-500 border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.1)]' : 'bg-gray-800 text-gray-400 border-gray-700 hover:text-white hover:bg-gray-700' }}">
+                                {{-- Gestion du Like --}}
+                                @auth
+                                    {{-- Utilisateur Connecté --}}
+                                    <form action="{{ route('videos.like', $video) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" 
+                                            class="flex items-center gap-2 px-5 py-2.5 rounded-full transition-all duration-300 border {{ auth()->user()->likedVideos->contains($video->id) ? 'bg-red-600/10 text-red-500 border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.1)]' : 'bg-gray-800 text-gray-400 border-gray-700 hover:text-white hover:bg-gray-700' }}">
+                                            
+                                            <svg class="w-6 h-6 {{ auth()->user()->likedVideos->contains($video->id) ? 'fill-current' : 'fill-none' }}" 
+                                                 stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                            </svg>
+                                            
+                                            <span class="font-bold text-sm">
+                                                {{ $video->likedByUsers->count() }}
+                                            </span>
+                                        </button>
+                                    </form>
+                                @else
+                                    {{-- Invité : Redirige vers Login --}}
+                                    <a href="{{ route('login') }}" 
+                                        class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700 hover:text-white hover:bg-gray-700 transition-all shadow-sm"
+                                        title="Connectez-vous pour liker">
                                         
-                                        <svg class="w-6 h-6 {{ auth()->user() && auth()->user()->likedVideos->contains($video->id) ? 'fill-current' : 'fill-none' }}" 
-                                             stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <svg class="w-6 h-6 fill-none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                         </svg>
                                         
-                                        <span class="font-bold text-sm">
-                                            {{ $video->likedByUsers->count() }}
-                                        </span>
-                                    </button>
-                                </form>
+                                        <span class="font-bold text-sm">{{ $video->likedByUsers->count() }}</span>
+                                    </a>
+                                @endauth
 
                                 {{-- Badge de niveau --}}
                                 <span class="px-3 py-1 bg-indigo-900/30 text-indigo-400 text-xs font-bold rounded-full border border-indigo-500/20 uppercase tracking-widest">
@@ -85,7 +100,6 @@
                         <div class="space-y-5">
                             @forelse($suggestions as $suggest)
                                 <a href="{{ route('videos.show', $suggest->slug) }}" class="flex gap-4 group">
-                                    {{-- Thumbnail suggestion --}}
                                     <div class="relative w-36 h-20 flex-shrink-0 overflow-hidden rounded-xl border border-gray-800 bg-gray-900 shadow-lg">
                                         <img src="{{ $suggest->thumbnail_url }}" 
                                              class="w-full h-full object-cover group-hover:scale-110 transition duration-500" 
@@ -96,7 +110,6 @@
                                         </span>
                                     </div>
                                     
-                                    {{-- Info suggestion --}}
                                     <div class="flex-1">
                                         <h3 class="text-white font-bold text-sm line-clamp-2 group-hover:text-indigo-400 transition-colors leading-snug">
                                             {{ $suggest->title }}
@@ -112,7 +125,6 @@
                             @endforelse
                         </div>
 
-                        {{-- Petit bouton de retour --}}
                         <div class="mt-10">
                             <a href="{{ route('videos.index') }}" class="inline-flex items-center gap-2 text-gray-500 hover:text-indigo-400 transition text-sm font-bold uppercase tracking-widest">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>

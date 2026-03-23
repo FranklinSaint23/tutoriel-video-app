@@ -47,10 +47,13 @@ class VideoController extends Controller
 
    public function toggleLike(Video $video)
     {
+        // Sécurité supplémentaire : si l'utilisateur n'est pas connecté, on redirige
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('info', 'Vous devez être connecté pour aimer une vidéo.');
+        }
+
         /** @var \App\Models\User $user */
         $user = auth()->user();
-
-        // Maintenant on utilise $user au lieu de auth()->user()
         $user->likedVideos()->toggle($video->id);
 
         return back();

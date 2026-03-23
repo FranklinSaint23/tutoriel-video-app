@@ -9,12 +9,12 @@ class DashboardController extends Controller
         /** @var \App\Models\User $user */
         $user = auth()->user();
         
-        // L'erreur Intelephense devrait disparaître ici
-        $favoriteVideos = $user->likedVideos()
-            ->with(['category', 'user'])
-            ->latest()
-            ->get();
+        // 1. Vidéos que J'AI uploadées (Relation simple HasMany)
+        $myVideos = \App\Models\Video::where('user_id', $user->id)->latest()->get();
 
-        return view('dashboard', compact('favoriteVideos'));
+        // 2. Vidéos que J'AI likées (Relation BelongsToMany via table pivot)
+        $favoriteVideos = $user->likedVideos()->with(['category', 'user'])->latest()->get();
+
+        return view('dashboard', compact('myVideos', 'favoriteVideos'));
     }
 }
