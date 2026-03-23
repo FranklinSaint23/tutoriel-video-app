@@ -47,4 +47,12 @@ class User extends Authenticatable
         return $this->belongsToMany(Video::class, 'video_user')->withTimestamps();
     }
 
+    public function comments() {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function ratings() {
+        return $this->hasMany(Rating::class);
+    }
+
 }

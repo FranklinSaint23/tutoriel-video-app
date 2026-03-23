@@ -36,4 +36,17 @@ class Video extends Model
     {
         return $this->belongsToMany(User::class, 'video_user')->withTimestamps();
     }
+
+    public function comments() {
+        return $this->hasMany(Comment::class)->latest();
+    }
+
+    public function ratings() {
+        return $this->hasMany(Rating::class);
+    }
+
+    // Méthode magique pour calculer la moyenne des notes
+    public function averageRating() {
+        return round($this->ratings()->avg('stars') ?? 0, 1);
+    }
 }
