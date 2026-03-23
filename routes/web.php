@@ -5,6 +5,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\VideoController; // Le contrôleur public
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\RatingController;
 
 // --- PARTIE PUBLIQUE (Accessible par tous) ---
 Route::get('/', [VideoController::class, 'index'])->name('videos.index');
@@ -40,4 +42,6 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/videos/{video}', [VideoController::class, 'destroy'])->name('videos.destroy');
     Route::get('/videos/create', [VideoController::class, 'create'])->name('videos.create');
     Route::post('/videos', [VideoController::class, 'store'])->name('videos.store');
+    Route::post('/videos/{video}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::post('/videos/{video}/rate', [RatingController::class, 'store'])->name('videos.rate');
 });
