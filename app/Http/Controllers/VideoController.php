@@ -47,8 +47,11 @@ class VideoController extends Controller
 
    public function toggleLike(Video $video)
     {
-        // toggle() ajoute si absent, retire si présent. Magique !
-        auth()->user()->likedVideos()->toggle($video->id);
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        // Maintenant on utilise $user au lieu de auth()->user()
+        $user->likedVideos()->toggle($video->id);
 
         return back();
     }
