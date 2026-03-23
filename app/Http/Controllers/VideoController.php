@@ -135,6 +135,7 @@ class VideoController extends Controller
             'description' => $request->description,
             'category_id' => $request->category_id,
             'level' => $request->level,
+            'is_published' => $request->has('is_published'), // Case à cocher
             // Le slug se mettra à jour via ton observer ou manuellement si nécessaire
         ]);
 

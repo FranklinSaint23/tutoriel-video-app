@@ -103,6 +103,7 @@ class VideoController extends Controller
             'description' => $request->description,
             'category_id' => $request->category_id,
             'level' => $request->level, // Maintenant, ce ne sera plus NULL
+            'is_published' => $request->has('is_published'), // Case à cocher
         ]);
 
         return redirect()->route('admin.videos.index')->with('success', 'Vidéo mise à jour !');

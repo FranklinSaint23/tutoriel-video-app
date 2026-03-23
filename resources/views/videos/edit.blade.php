@@ -66,6 +66,15 @@
                         @error('description') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
+                    <div class="flex items-center gap-3 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
+                        <input type="checkbox" name="is_published" id="is_published" 
+                            {{ old('is_published', $video->is_published ?? false) ? 'checked' : '' }}
+                            class="w-5 h-5 text-indigo-600 rounded border-gray-700 focus:ring-indigo-500 bg-gray-900">
+                        <label for="is_published" class="text-sm font-bold text-gray-300 uppercase tracking-widest cursor-pointer">
+                            Rendre ce tutoriel public (Publier)
+                        </label>
+                    </div>
+
                     {{-- Actions --}}
                     <div class="pt-4 flex items-center justify-end gap-4">
                         <a href="{{ route('dashboard') }}" class="text-gray-400 hover:text-white transition text-sm font-bold">Annuler</a>

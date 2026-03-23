@@ -47,6 +47,15 @@
                         @error('level') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
 
+                    <div class="flex items-center gap-3 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
+                        <input type="checkbox" name="is_published" id="is_published" 
+                            {{ old('is_published', $video->is_published ?? false) ? 'checked' : '' }}
+                            class="w-5 h-5 text-indigo-600 rounded border-gray-700 focus:ring-indigo-500 bg-gray-900">
+                        <label for="is_published" class="text-sm font-bold text-gray-300 uppercase tracking-widest cursor-pointer">
+                            Rendre ce tutoriel public (Publier)
+                        </label>
+                    </div>
+
                     <div class="flex items-center justify-end mt-4">
                         <a href="{{ route('admin.videos.index') }}" class="bg-red-500 hover:bg-indigo-600 text-sm text-black py-2 px-4 rounded-md">Annuler</a>
                         <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
