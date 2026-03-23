@@ -33,3 +33,9 @@ Route::post('/videos/{video}/like', [VideoController::class, 'toggleLike'])->nam
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard'); // <-- C'est ce nom qui manquait !
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/videos/{video}/edit', [VideoController::class, 'edit'])->name('videos.edit');
+    Route::put('/videos/{video}', [VideoController::class, 'update'])->name('videos.update');
+    Route::delete('/videos/{video}', [VideoController::class, 'destroy'])->name('videos.destroy');
+});

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Video;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage;
 
 class VideoController extends Controller
 {
@@ -57,5 +58,72 @@ class VideoController extends Controller
         $user->likedVideos()->toggle($video->id);
 
         return back();
+    }
+
+    /**
+     * Affiche le formulaire de modification.
+     */
+    public function edit(Video $video): View
+    {
+        // Vérification de sécurité : Seul l'auteur peut modifier
+        if (auth()->id() !== $video->user_id) {
+            abort(403, 'Action non autorisée.');
+        }
+
+        $categories = \App\Models\Category::all();
+        return view('videos.edit', compact('video', 'categories'));
+    }
+
+    /**
+     * Met à jour la vidéo dans la base de données.
+     */
+    public function update(Request $request, Video $video)
+    {
+        if (auth()->id() !== $video->user_id) {
+            abort(403);
+        }
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'category_id' => 'required|exists:categories,id',
+            'level' => 'required|in:débutant,intermédiaire,avancé',
+        ]);
+
+        $video->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'category_id' => $request->category_id,
+            'level' => $request->level,
+            // Le slug se mettra à jour via ton observer ou manuellement si nécessaire
+        ]);
+
+        return redirect()->route('dashboard')->with('success', 'Tutoriel mis à jour avec succès !');
+    }
+
+    /**
+     * Supprime la vidéo de la base de données et du stockage physique.
+     */
+    public function destroy(Video $video)
+    {
+        if (auth()->id() !== $video->user_id) {
+            abort(403);
+        }
+
+        // 1. Suppression des fichiers physiques sur le disque
+        // On extrait le chemin relatif (ex: tutos/nom_video.mp4)
+        if ($video->video_url) {
+            $path = str_replace('/storage/', '', $video->video_url);
+            Storage::disk('public')->delete($path);
+        }
+
+        if ($video->thumbnail_url) {
+            $thumbPath = str_replace('/storage/', '', $video->thumbnail_url);
+            Storage::disk('public')->delete($thumbPath);
+        }
+
+        // 2. Suppression de l'enregistrement en base de données
+        $video->delete();
+        return redirect()->route('dashboard')->with('success', 'Tutoriel supprimé définitivement.');
     }
 }
