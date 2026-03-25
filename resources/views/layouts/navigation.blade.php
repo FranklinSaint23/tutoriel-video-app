@@ -35,9 +35,18 @@
                             {{ __('Mon Profil') }}
                         </x-dropdown-link>
 
+                        <x-dropdown-link :href="route('videos.index')">
+                            {{ __('Découvrir les tutos') }}
+                        </x-dropdown-link>
+
                         <x-dropdown-link :href="route('dashboard')">
                             {{ __('Mon Dashboard') }}
                         </x-dropdown-link>
+
+                        <x-dropdown-link :href="route('playlists.index')">
+                            {{ __('Mes Playlists') }}
+                        </x-dropdown-link>
+
 
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

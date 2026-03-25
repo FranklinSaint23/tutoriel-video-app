@@ -10,6 +10,11 @@
                     </h1>
                     <p class="text-gray-500 text-sm mt-2">Retrouvez vos cours et tutoriels organisés par thématiques.</p>
                 </div>
+                <div class="flex">
+                    <a href="{{ route('videos.index') }}" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-bold rounded-lg transition border border-gray-700">
+                        Découvrir tutos
+                    </a>
+                </div>
             </div>
 
             @if($playlists->isEmpty())
@@ -31,7 +36,7 @@
                         <div class="group bg-gray-900 border border-gray-800 rounded-3xl overflow-hidden hover:border-indigo-500/50 transition-all duration-500 shadow-lg hover:shadow-indigo-500/10">
                             
                             {{-- Aperçu Visuel --}}
-                            <div class="relative aspect-video bg-gray-800 flex items-center justify-center overflow-hidden">
+                            <div class="relative aspect-video bg-gray-750 flex items-center justify-center overflow-hidden">
                                 @if($playlist->videos->isNotEmpty())
                                     <img src="{{ $playlist->videos->first()->thumbnail_url }}" class="w-full h-full object-cover opacity-40 group-hover:scale-110 transition duration-700">
                                 @endif
@@ -43,7 +48,7 @@
                                         {{ $playlist->videos_count }} {{ Str::plural('Vidéo', $playlist->videos_count) }}
                                     </div>
                                     
-                                    <div class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
+                                    <div class="w-10 h-10 rounded-full bg-indigo-600 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
                                         <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                                     </div>
                                 </div>
@@ -61,12 +66,14 @@
                                         Voir le contenu
                                     </a>
                                     
-                                    {{-- Optionnel : Bouton supprimer --}}
-                                    <form action="#" method="POST">
+                                    {{-- Suppression de la Playlist --}}
+                                    <form action="{{ route('playlists.destroy', $playlist->id) }}" method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer cette playlist ? Cette action est irréversible.')">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="p-3 text-gray-600 hover:text-red-500 transition">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        <button type="submit" class="p-3 text-gray-600 hover:text-red-500 transition-colors duration-300">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
                                         </button>
                                     </form>
                                 </div>

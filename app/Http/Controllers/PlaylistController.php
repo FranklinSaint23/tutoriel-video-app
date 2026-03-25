@@ -72,4 +72,35 @@ class PlaylistController extends Controller
 
         return view('playlists.show', compact('playlist', 'currentVideo'));
     }
+
+    /**
+     * Supprimer une playlist complète.
+     */
+    public function destroy(Playlist $playlist)
+    {
+        // Vérification de sécurité
+        if ($playlist->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $playlist->delete();
+
+        return redirect()->route('playlists.index')
+            ->with('success', "La playlist a été supprimée.");
+    }
+
+    /**
+     * Retirer une vidéo spécifique d'une playlist (sans supprimer la vidéo de la BDD).
+     */
+    public function removeVideo(Playlist $playlist, Video $video)
+    {
+        if ($playlist->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // On détache l'enregistrement dans la table pivot
+        $playlist->videos()->detach($video->id);
+
+        return back()->with('success', "Vidéo retirée de la playlist.");
+    }
 }

@@ -75,4 +75,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/my-playlists', [PlaylistController::class, 'index'])->name('playlists.index');
     Route::get('/playlists/{playlist}', [PlaylistController::class, 'show'])->name('playlists.view');
+    Route::delete('/playlists/{playlist}', [PlaylistController::class, 'destroy'])->name('playlists.destroy');
+    Route::delete('/playlists/{playlist}/video/{video}', [PlaylistController::class, 'removeVideo'])->name('playlists.remove-video');
 });

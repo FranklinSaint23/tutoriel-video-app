@@ -53,26 +53,50 @@
                         
                         <div class="max-h-[70vh] overflow-y-auto custom-scrollbar">
                             @foreach($playlist->videos as $index => $video)
-                                <a href="{{ route('playlists.view', ['playlist' => $playlist->id, 'video' => $video->id]) }}" 
-                                   class="flex items-center gap-4 p-4 border-b border-gray-800 transition-all hover:bg-gray-800 {{ $currentVideo && $currentVideo->id == $video->id ? 'bg-indigo-600/10 border-l-4 border-l-indigo-500' : '' }}">
+                                <div class="relative group border-b border-gray-800"> {{-- Conteneur parent --}}
                                     
-                                    <div class="text-gray-600 font-bold text-xs">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</div>
-                                    
-                                    <div class="relative w-20 h-12 flex-shrink-0 rounded-lg overflow-hidden border border-gray-700">
-                                        <img src="{{ $video->thumbnail_url }}" class="w-full h-full object-cover">
-                                        @if($currentVideo && $currentVideo->id == $video->id)
-                                            <div class="absolute inset-0 bg-indigo-600/40 flex items-center justify-center">
-                                                <svg class="w-4 h-4 text-white fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                            </div>
-                                        @endif
-                                    </div>
+                                    {{-- Lien principal vers la vidéo --}}
+                                    <a href="{{ route('playlists.view', ['playlist' => $playlist->id, 'video' => $video->id]) }}" 
+                                    class="flex items-center gap-4 p-4 transition-all hover:bg-gray-800/50 {{ $currentVideo && $currentVideo->id == $video->id ? 'bg-indigo-600/10 border-l-4 border-l-indigo-500' : '' }}">
+                                        
+                                        {{-- Index 01, 02... --}}
+                                        <div class="text-gray-600 font-bold text-xs">
+                                            {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
+                                        </div>
+                                        
+                                        {{-- Thumbnail avec overlay si actif --}}
+                                        <div class="relative w-20 h-12 flex-shrink-0 rounded-lg overflow-hidden border border-gray-700">
+                                            <img src="{{ $video->thumbnail_url }}" class="w-full h-full object-cover">
+                                            @if($currentVideo && $currentVideo->id == $video->id)
+                                                <div class="absolute inset-0 bg-indigo-600/40 flex items-center justify-center">
+                                                    <svg class="w-4 h-4 text-white fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                                </div>
+                                            @endif
+                                        </div>
 
-                                    <div class="flex-1">
-                                        <h4 class="text-white text-[11px] font-bold line-clamp-2 leading-tight {{ $currentVideo && $currentVideo->id == $video->id ? 'text-indigo-400' : '' }}">
-                                            {{ $video->title }}
-                                        </h4>
-                                    </div>
-                                </a>
+                                        {{-- Titre de la vidéo --}}
+                                        <div class="flex-1 pr-6"> {{-- Padding à droite pour ne pas chevaucher la croix --}}
+                                            <h4 class="text-white text-[11px] font-bold line-clamp-2 leading-tight {{ $currentVideo && $currentVideo->id == $video->id ? 'text-indigo-400' : '' }}">
+                                                {{ $video->title }}
+                                            </h4>
+                                        </div>
+                                    </a>
+
+                                    {{-- Bouton de suppression (La Croix) --}}
+                                    <form action="{{ route('playlists.remove-video', [$playlist->id, $video->id]) }}" 
+                                        method="POST" 
+                                        class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                        onsubmit="return confirm('Retirer cette vidéo de la playlist ?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="p-1 text-gray-500 hover:text-red-500 bg-gray-900/80 rounded-md backdrop-blur-sm border border-gray-700 shadow-xl">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </form>
+
+                                </div>
                             @endforeach
                         </div>
                     </div>
