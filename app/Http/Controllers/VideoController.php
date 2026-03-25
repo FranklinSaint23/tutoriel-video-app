@@ -8,6 +8,9 @@ use Illuminate\View\View;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Models\Category;
+use App\Models\User;
+use App\Notifications\NewVideoPublished;
+use Illuminate\Support\Facades\Notification;
 
 class VideoController extends Controller
 {
@@ -20,33 +23,40 @@ class VideoController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validation stricte (Génie Logiciel : ne jamais faire confiance à l'utilisateur)
+        // 1. Validation stricte
         $request->validate([
             'title' => 'required|max:255',
             'description' => 'required',
             'category_id' => 'required|exists:categories,id',
-            'video' => 'required|mimes:mp4,mov,ogg,qt|max:20000', // Max 20MB pour le test
-            'thumbnail' => 'required|image|mimes:jpeg,png,jpg|max:2048'
+            'video' => 'required|mimes:mp4,mov,ogg,qt|max:20000', 
+            'thumbnail' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'level' => 'required'
         ]);
 
         // 2. Gestion de l'upload des fichiers
         $videoPath = $request->file('video')->store('tutos', 'public');
         $thumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
 
-        // 3. Création en base de données
-        Video::create([
+        // 3. Création et récupération de l'instance (Crucial pour la notification)
+        $video = Video::create([
             'title' => $request->title,
             'slug' => Str::slug($request->title) . '-' . rand(100, 999),
             'description' => $request->description,
             'video_url' => asset('storage/' . $videoPath),
             'thumbnail_url' => asset('storage/' . $thumbnailPath),
             'category_id' => $request->category_id,
-            'user_id' => auth()->id(), // <--- RÉCUPÈRE L'ID DE L'UTILISATEUR CONNECTÉ
+            'user_id' => auth()->id(),
             'level' => $request->level,
             'is_published' => true
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'Vidéo publiée avec succès !');
+        // 4. Notification (Génie Logiciel : On évite de notifier l'auteur lui-même)
+        $users = User::where('id', '!=', auth()->id())->get();
+        
+        // On envoie la notification à tous les autres utilisateurs
+        Notification::send($users, new NewVideoPublished($video));
+
+        return redirect()->route('dashboard')->with('success', 'La vidéo "' . $video->title . '" a été publiée et vos abonnés ont été notifiés !');
     }
 
     public function index(Request $request): View

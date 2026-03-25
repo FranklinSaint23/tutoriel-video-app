@@ -20,7 +20,7 @@
                     <button class="relative p-2 text-gray-400 hover:text-indigo-500 transition-all duration-300 focus:outline-none group">
                         {{-- Icône Cloche --}}
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31c.55-.254.943-.797.943-1.393V9a8.25 8.25 0 0 0-15.75-2.25v5.377c0 .596.392 1.14.943 1.393a23.848 23.848 0 0 0 5.454 1.31m5.714 0m-5.714 0a3 3 0 1 1 5.714 0M3.124 7.5A8.969 8.969 0 0 1 5.292 3m13.416 0a8.969 8.969 0 0 1 2.168 4.5" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31c.55-.254.943-.797.943-1.393V9a8.25 8.25 0 0 0-15.75-2.25v5.377c0 .596.392 1.14.943 1.393a23.848 23.848 0 0 0 5.454 1.31m5.714 0m-5.714 0a3 3 0 1 1 5.714 0" />
                         </svg>
 
                         {{-- Badge animé (Optionnel: ajouter une condition Blade ici si tu as des notifs en BDD) --}}
