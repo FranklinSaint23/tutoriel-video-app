@@ -6,7 +6,7 @@
             {{-- Partie Gauche : Logo --}}
             <div class="flex">
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
+                    <a href="#">
                         <x-application-logo class="block h-9 w-auto fill-current text-indigo-500" />
                     </a>
                 </div>
@@ -17,7 +17,9 @@
                 
                 {{-- 1. Bouton Notification --}}
                 <div class="relative flex items-center">
-                    <button class="relative p-2 text-gray-400 hover:text-indigo-500 transition-all duration-300 focus:outline-none group">
+                    <button id="notificationButton" 
+                        onclick="markNotificationsAsRead()"
+                        class="relative p-2 text-gray-400 hover:text-indigo-500 transition-all duration-300 focus:outline-none group">
                         {{-- Icône Cloche --}}
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31c.55-.254.943-.797.943-1.393V9a8.25 8.25 0 0 0-15.75-2.25v5.377c0 .596.392 1.14.943 1.393a23.848 23.848 0 0 0 5.454 1.31m5.714 0m-5.714 0a3 3 0 1 1 5.714 0" />
@@ -26,9 +28,9 @@
                         {{-- Badge animé (Optionnel: ajouter une condition Blade ici si tu as des notifs en BDD) --}}
                         @auth
                             @if(auth()->user()->unreadNotifications->count() > 0)
-                                <span class="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
+                                <span id="notificationBadge" class="absolute top-2 right-2 flex h-2 w-2 {{ auth()->user()->unreadNotifications->count() == 0 ? 'hidden' : '' }}">
                                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-600 border border-gray-950"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-600 border border-gray-900"></span>
                                 </span>
                             @endif
                         @endauth
@@ -39,6 +41,35 @@
                             Notifications
                         </span>
                     </button>
+                    <script>
+                        function markNotificationsAsRead() {
+                            // 1. On cache immédiatement pour une sensation de vitesse (Optimistic UI)
+                            const badge = document.getElementById('notificationBadge');
+                            if(badge) badge.classList.add('hidden'); 
+
+                            // 2. On informe le serveur
+                            fetch('{{ route("notifications.markAllAsRead") }}', {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                }
+                            })
+                            .then(response => {
+                                if (!response.ok) throw new Error('Erreur réseau');
+                                return response.json();
+                            })
+                            .then(data => {
+                                console.log('Notifications marquées comme lues:', data);
+                            })
+                            .catch(error => {
+                                console.error('Erreur:', error);
+                                // Si ça échoue, on réaffiche le badge
+                                if(badge) badge.classList.remove('hidden');
+                            });
+                        }
+                        </script>
                 </div>
 
                 {{-- 2. Dropdown Profil --}}
