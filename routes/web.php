@@ -72,4 +72,7 @@ Route::middleware(['auth'])->group(function () {
     // 4. (Optionnel) Voir le contenu d'une playlist spécifique
     Route::get('/playlists/{playlist}', [PlaylistController::class, 'show'])
         ->name('playlists.view');
+
+    Route::get('/my-playlists', [PlaylistController::class, 'index'])->name('playlists.index');
+    Route::get('/playlists/{playlist}', [PlaylistController::class, 'show'])->name('playlists.view');
 });

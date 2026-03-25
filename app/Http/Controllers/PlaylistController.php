@@ -43,4 +43,33 @@ class PlaylistController extends Controller
 
         return back()->with('info', "Cette vidéo est déjà dans la playlist.");
     }
+
+    public function index()
+    {
+        // On récupère les playlists avec le compte des vidéos pour l'affichage
+        $playlists = auth()->user()->playlists()
+            ->withCount('videos')
+            ->latest()
+            ->get();
+
+        return view('playlists.index', compact('playlists'));
+    }
+
+    public function show(Playlist $playlist, Request $request)
+    {
+        // Sécurité : Vérifier que l'utilisateur est le propriétaire
+        if ($playlist->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // Charger les vidéos de la playlist
+        $playlist->load('videos');
+
+        // Déterminer la vidéo à lire (la première par défaut ou celle passée en paramètre)
+        $currentVideo = $request->has('video') 
+            ? $playlist->videos->where('id', $request->video)->first() 
+            : $playlist->videos->first();
+
+        return view('playlists.show', compact('playlist', 'currentVideo'));
+    }
 }
