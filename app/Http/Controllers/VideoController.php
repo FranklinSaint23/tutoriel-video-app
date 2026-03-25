@@ -167,4 +167,5 @@ class VideoController extends Controller
         $video->delete();
         return redirect()->route('dashboard')->with('success', 'Tutoriel supprimé définitivement.');
     }
+
 }

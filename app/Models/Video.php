@@ -49,4 +49,5 @@ class Video extends Model
     public function averageRating() {
         return round($this->ratings()->avg('stars') ?? 0, 1);
     }
+
 }

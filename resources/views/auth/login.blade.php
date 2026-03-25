@@ -38,10 +38,17 @@
                     {{ __('Forgot your password?') }}
                 </a>
             @endif
+            <div class="flex gap-2">
+                <x-primary-button class="ms-3">
+                    {{ __('Log in') }}
+                </x-primary-button>
 
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
+                <a class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg shadow-lg shadow-red-500/20 transition-all transform" href="{{ route('register') }}">
+                    {{ __('Sign up') }}
+                </a>
+
+            </div>
+            
         </div>
     </form>
 </x-guest-layout>

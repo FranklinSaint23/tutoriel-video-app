@@ -7,10 +7,12 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\RatingController;
+use App\Http\Controllers\PlaylistController;
+
+
 
 // --- PARTIE PUBLIQUE (Accessible par tous) ---
-Route::get('/', [VideoController::class, 'index'])->name('videos.index');
-Route::get('/watch/{slug}', [VideoController::class, 'show'])->name('videos.show');
+
 
 // --- PARTIE ADMIN (Seulement si connecté) ---
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
@@ -37,6 +39,8 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->name('dashboard'); // <-- C'est ce nom qui manquait !
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/', [VideoController::class, 'index'])->name('videos.index');
+    Route::get('/watch/{slug}', [VideoController::class, 'show'])->name('videos.show');
     Route::get('/videos/{video}/edit', [VideoController::class, 'edit'])->name('videos.edit');
     Route::put('/videos/{video}', [VideoController::class, 'update'])->name('videos.update');
     Route::delete('/videos/{video}', [VideoController::class, 'destroy'])->name('videos.destroy');
@@ -44,4 +48,28 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/videos', [VideoController::class, 'store'])->name('videos.store');
     Route::post('/videos/{video}/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::post('/videos/{video}/rate', [RatingController::class, 'store'])->name('videos.rate');
+});
+
+
+// On protège ces routes avec le middleware 'auth' car seul un utilisateur connecté 
+// peut gérer ses propres playlists.
+Route::middleware(['auth'])->group(function () {
+
+    // 1. Créer une nouvelle playlist (et y ajouter une vidéo si video_id est présent)
+    Route::post('/playlists', [PlaylistController::class, 'store'])
+        ->name('playlists.store');
+
+    // 2. Ajouter une vidéo spécifique à une playlist existante
+    // On utilise le "Route Model Binding" pour récupérer automatiquement 
+    // l'objet Playlist et l'objet Video via leurs IDs.
+    Route::post('/playlists/{playlist}/add-video/{video}', [PlaylistController::class, 'addVideo'])
+        ->name('playlists.add');
+
+    // 3. (Optionnel) Voir toutes ses playlists
+    Route::get('/my-playlists', [PlaylistController::class, 'index'])
+        ->name('playlists.index');
+        
+    // 4. (Optionnel) Voir le contenu d'une playlist spécifique
+    Route::get('/playlists/{playlist}', [PlaylistController::class, 'show'])
+        ->name('playlists.view');
 });

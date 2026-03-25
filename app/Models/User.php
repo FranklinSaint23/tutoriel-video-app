@@ -55,4 +55,9 @@ class User extends Authenticatable
         return $this->hasMany(Rating::class);
     }
 
+    public function playlists() {
+        return $this->hasMany(Playlist::class);
+    }
+
+
 }

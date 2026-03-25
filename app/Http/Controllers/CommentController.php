@@ -15,7 +15,7 @@ class CommentController extends Controller
 
         $video->comments()->create([
             'user_id' => auth()->id(),
-            'content' => $request->content,
+            'content' => $request->input('content'), // Cible spécifiquement le champ du formulaire
         ]);
 
         return back()->with('success', 'Votre commentaire a été publié !');
