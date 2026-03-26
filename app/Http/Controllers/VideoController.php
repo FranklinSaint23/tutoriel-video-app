@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Video;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Models\Category;
@@ -59,8 +60,15 @@ class VideoController extends Controller
         return redirect()->route('dashboard')->with('success', 'La vidéo "' . $video->title . '" a été publiée et vos abonnés ont été notifiés !');
     }
 
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        // 1. Redirection Prioritaire : Si l'utilisateur est admin, on l'envoie vers l'interface de gestion
+        if ($user && $user->role === 'admin') {
+            return redirect()->route('admin.videos.index');
+        }
         $search = $request->query('search');
 
         $videos = Video::with(['category', 'user']) // On charge l'auteur aussi

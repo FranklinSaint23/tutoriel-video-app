@@ -18,7 +18,7 @@
                 {{-- 1. Bouton Notification --}}
                 <div class="relative flex items-center">
                     <button id="notificationButton" 
-                        onclick="markNotificationsAsRead()"
+                        onclick="markNotificationsAsRead(event)"
                         class="relative p-2 text-gray-400 hover:text-indigo-500 transition-all duration-300 focus:outline-none group">
                         {{-- Icône Cloche --}}
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -42,34 +42,39 @@
                         </span>
                     </button>
                     <script>
-                        function markNotificationsAsRead() {
-                            // 1. On cache immédiatement pour une sensation de vitesse (Optimistic UI)
-                            const badge = document.getElementById('notificationBadge');
-                            if(badge) badge.classList.add('hidden'); 
+                    function markNotificationsAsRead(event) {
+                        if (event) event.preventDefault(); // Empêche tout rechargement accidentel
 
-                            // 2. On informe le serveur
-                            fetch('{{ route("notifications.markAllAsRead") }}', {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                    'Content-Type': 'application/json',
-                                    'Accept': 'application/json',
-                                }
-                            })
-                            .then(response => {
-                                if (!response.ok) throw new Error('Erreur réseau');
-                                return response.json();
-                            })
-                            .then(data => {
-                                console.log('Notifications marquées comme lues:', data);
-                            })
-                            .catch(error => {
-                                console.error('Erreur:', error);
-                                // Si ça échoue, on réaffiche le badge
-                                if(badge) badge.classList.remove('hidden');
-                            });
+                        const badge = document.getElementById('notificationBadge');
+                        
+                        // 1. On cache immédiatement (UI Optimiste)
+                        if(badge) {
+                            badge.style.setProperty('display', 'none', 'important');
+                            badge.classList.add('hidden');
                         }
-                        </script>
+
+                        // 2. Appel API
+                        fetch('{{ route("notifications.markAllAsRead") }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if(!data.success && badge) {
+                                // Si le serveur dit non, on réaffiche
+                                badge.style.display = 'flex';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erreur:', error);
+                            if(badge) badge.style.display = 'flex';
+                        });
+                    }
+                    </script>
                 </div>
 
                 {{-- 2. Dropdown Profil --}}
