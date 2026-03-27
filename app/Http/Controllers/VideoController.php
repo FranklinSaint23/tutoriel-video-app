@@ -12,6 +12,7 @@ use App\Models\Category;
 use App\Models\User;
 use App\Notifications\NewVideoPublished;
 use Illuminate\Support\Facades\Notification;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class VideoController extends Controller
 {
@@ -22,44 +23,49 @@ class VideoController extends Controller
         return view('videos.create', compact('categories'));
     }
 
+
     public function store(Request $request)
     {
-        // 1. Validation stricte
+        // 1. Validation STRICTE d'abord (On ne dépense pas de bande passante si le titre est vide)
         $request->validate([
             'title' => 'required|max:255',
             'description' => 'required',
             'category_id' => 'required|exists:categories,id',
-            'video' => 'required|mimes:mp4,mov,ogg,qt|max:20000', 
+            'video' => 'required|mimes:mp4,mov,ogg,qt|max:50000', // Augmenté à 50Mo pour le Cloud
             'thumbnail' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'level' => 'required'
         ]);
 
-        // 2. Gestion de l'upload des fichiers
-        $videoPath = $request->file('video')->store('tutos', 'public');
-        $thumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
+        // 2. Upload vers Cloudinary (Vidéo ET Miniature)
+        // On utilise Cloudinary pour les deux afin d'avoir un site rapide partout
+        $cloudinaryVideo = Cloudinary::uploadVideo($request->file('video')->getRealPath(), [
+            'folder' => 'tutos/videos',
+        ]);
+        
+        $cloudinaryThumbnail = Cloudinary::upload($request->file('thumbnail')->getRealPath(), [
+            'folder' => 'tutos/thumbnails',
+        ]);
 
-        // 3. Création et récupération de l'instance (Crucial pour la notification)
+        // 3. Création de l'enregistrement en base de données
         $video = Video::create([
             'title' => $request->title,
             'slug' => Str::slug($request->title) . '-' . rand(100, 999),
             'description' => $request->description,
-            'video_url' => asset('storage/' . $videoPath),
-            'thumbnail_url' => asset('storage/' . $thumbnailPath),
+            'video_url' => $cloudinaryVideo->getSecurePath(), // URL Cloudinary stable
+            'thumbnail_url' => $cloudinaryThumbnail->getSecurePath(), // URL Cloudinary stable
             'category_id' => $request->category_id,
             'user_id' => auth()->id(),
             'level' => $request->level,
             'is_published' => true
         ]);
 
-        // 4. Notification (Génie Logiciel : On évite de notifier l'auteur lui-même)
-        $users = User::where('id', '!=', auth()->id())->get();
-        
-        // On envoie la notification à tous les autres utilisateurs
-        Notification::send($users, new NewVideoPublished($video));
+        // 4. Notification aux autres utilisateurs
+        // Génie Logiciel : On récupère les IDs pour être plus performant sur les grosses listes
+        $otherUsers = User::where('id', '!=', auth()->id())->get();
+        Notification::send($otherUsers, new NewVideoPublished($video));
 
-        return redirect()->route('dashboard')->with('success', 'La vidéo "' . $video->title . '" a été publiée et vos abonnés ont été notifiés !');
+        return redirect()->route('dashboard')->with('success', 'La vidéo "' . $video->title . '" est en ligne sur le Cloud !');
     }
-
     public function index(Request $request): View|RedirectResponse
     {
         /** @var \App\Models\User $user */
