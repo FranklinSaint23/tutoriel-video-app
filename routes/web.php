@@ -64,3 +64,14 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/playlists/{playlist}', [PlaylistController::class, 'destroy'])->name('playlists.destroy');
     Route::delete('/playlists/{playlist}/video/{video}', [PlaylistController::class, 'removeVideo'])->name('playlists.remove-video');
 });
+
+
+
+Route::get('/setup-db', function () {
+    \App\Models\User::updateOrCreate(['email' => 'admin@gmail.com'], [
+        'name' => 'admin',
+        'password' => bcrypt('admin'),
+        'role' => 'admin',
+    ]);
+    return "Base de données initialisée !";
+});
