@@ -24,45 +24,56 @@ class VideoController extends Controller
     }
 
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        // 1. Validation STRICTE d'abord (On ne dépense pas de bande passante si le titre est vide)
+        // 1. Validation STRICTE
         $request->validate([
             'title' => 'required|max:255',
             'description' => 'required',
             'category_id' => 'required|exists:categories,id',
-            'video' => 'required|mimes:mp4,mov,ogg,qt|max:50000', // Augmenté à 50Mo pour le Cloud
+            'video' => 'required|mimes:mp4,mov,ogg,qt|max:51200', // 50Mo
             'thumbnail' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'level' => 'required'
         ]);
 
-        // 2. Upload vers Cloudinary (Vidéo ET Miniature)
-        // On utilise Cloudinary pour les deux afin d'avoir un site rapide partout
-        $cloudinaryVideo = Cloudinary::uploadVideo($request->file('video')->getRealPath(), [
+        // 2. Préparation des options pour le SSL en local (Optionnel mais propre)
+        $uploadOptions = [
             'folder' => 'tutos/videos',
-        ]);
+            'resource_type' => 'video',
+        ];
+
+        if (app()->environment('local')) {
+            $uploadOptions['curl_opts'] = [
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYHOST => false,
+            ];
+        }
+
+        // 3. Upload vers Cloudinary
+        $cloudinaryVideo = Cloudinary::uploadVideo($request->file('video')->getRealPath(), $uploadOptions);
         
         $cloudinaryThumbnail = Cloudinary::upload($request->file('thumbnail')->getRealPath(), [
             'folder' => 'tutos/thumbnails',
         ]);
 
-        // 3. Création de l'enregistrement en base de données
+        // 4. Création de l'enregistrement avec getSecurePath() pour le HTTPS
         $video = Video::create([
             'title' => $request->title,
             'slug' => Str::slug($request->title) . '-' . rand(100, 999),
             'description' => $request->description,
-            'video_url' => $cloudinaryVideo->getSecurePath(), // URL Cloudinary stable
-            'thumbnail_url' => $cloudinaryThumbnail->getSecurePath(), // URL Cloudinary stable
+            'video_url' => $cloudinaryVideo->getSecurePath(), 
+            'thumbnail_url' => $cloudinaryThumbnail->getSecurePath(),
             'category_id' => $request->category_id,
             'user_id' => auth()->id(),
             'level' => $request->level,
             'is_published' => true
         ]);
 
-        // 4. Notification aux autres utilisateurs
-        // Génie Logiciel : On récupère les IDs pour être plus performant sur les grosses listes
+        // 5. Notification (Optimisée)
         $otherUsers = User::where('id', '!=', auth()->id())->get();
-        Notification::send($otherUsers, new NewVideoPublished($video));
+        if ($otherUsers->isNotEmpty()) {
+            Notification::send($otherUsers, new NewVideoPublished($video));
+        }
 
         return redirect()->route('dashboard')->with('success', 'La vidéo "' . $video->title . '" est en ligne sur le Cloud !');
     }
