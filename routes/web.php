@@ -66,3 +66,49 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
+
+use App\Models\Category;
+use Illuminate\Support\Str;
+
+Route::get('/setup', function () {
+    // Une liste exhaustive pour couvrir tous les aspects de tes tutoriels
+    $categories = [
+        // Développement Web
+        'Laravel Framework',
+        'Frontend (Vue.js / React)',
+        'Tailwind CSS',
+        'JavaScript Moderne',
+        
+        // Mobile & Desktop
+        'Développement Mobile (Flutter)',
+        'Desktop Apps (Electron)',
+        
+        // Backend & Infrastructure
+        'Node.js & API',
+        'Docker & Kubernetes',
+        'Déploiement Cloud (AWS/GCP)',
+        'CI/CD & GitHub Actions',
+        
+        // Sécurité & Systèmes
+        'Hacking Éthique',
+        'Administration Linux (Ubuntu)',
+        'Sécurité des Réseaux',
+        'Audit de Code PHP',
+        
+        // Data & IA
+        'Python pour la Data',
+        'Intelligence Artificielle',
+        'Bases de Données (PostgreSQL/NoSQL)'
+    ];
+
+    $count = 0;
+    foreach ($categories as $name) {
+        Category::updateOrCreate(
+            ['name' => $name], // Recherche par nom
+            ['slug' => Str::slug($name)] // Crée ou met à jour le slug
+        );
+        $count++;
+    }
+
+    return "Félicitations ! " . $count . " catégories professionnelles sont maintenant prêtes dans ta base de données.";
+});
