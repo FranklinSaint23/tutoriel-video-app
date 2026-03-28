@@ -67,11 +67,28 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-Route::get('/setup-db', function () {
-    \App\Models\User::updateOrCreate(['email' => 'admin@gmail.com'], [
-        'name' => 'admin',
-        'password' => bcrypt('admin'),
-        'role' => 'admin',
-    ]);
-    return "Base de données initialisée !";
+use App\Models\Category;
+use Illuminate\Support\Str;
+
+Route::get('/setup-categories', function () {
+    // Liste des catégories pour ton application de tutoriels
+    $categories = [
+        'Développement Laravel',
+        'Cyber Sécurité',
+        'Administration Système',
+        'DevOps & Cloud',
+        'Bases de Données'
+    ];
+
+    $count = 0;
+    foreach ($categories as $name) {
+        // updateOrCreate évite les doublons si tu rafraîchis la page
+        Category::updateOrCreate(
+            ['name' => $name],
+            ['slug' => Str::slug($name)]
+        );
+        $count++;
+    }
+
+    return "Succès : " . $count . " catégories ont été configurées dans la base de données !";
 });
