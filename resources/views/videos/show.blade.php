@@ -13,7 +13,8 @@
                             controlsList="nodownload" 
                             poster="{{ $video->thumbnail_url }}" 
                             class="w-full h-full object-contain focus:outline-none">
-                            <source src="{{ asset(ltrim($video->video_url, '/')) }}" type="video/mp4">
+                            {{-- CORRECTION ICI : On utilise directement l'URL sécurisée de Cloudinary avec l'auto-format --}}
+                            <source src="{{ str_replace('/upload/', '/upload/f_auto,vc_auto/', $video->video_url) }}" type="video/mp4">
                             Votre navigateur ne supporte pas la lecture de vidéos.
                         </video>
                     </div>
@@ -108,7 +109,7 @@
                         </div>
                     </div>
 
-                    {{-- 3. SECTION NOTATION & COMMENTAIRES (STRICTEMENT IDENTIQUE) --}}
+                    {{-- 3. SECTION NOTATION & COMMENTAIRES --}}
                     <div class="space-y-6">
                         @auth
                             <div class="bg-indigo-900/10 border border-indigo-500/20 rounded-2xl p-6">
@@ -169,7 +170,7 @@
                     </div>
                 </div>
 
-                {{-- SIDEBAR : RECOMMANDATIONS (STRICTEMENT IDENTIQUE) --}}
+                {{-- SIDEBAR : RECOMMANDATIONS --}}
                 <div class="lg:col-span-1">
                     <div class="sticky top-6">
                         <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2 uppercase tracking-tighter">
