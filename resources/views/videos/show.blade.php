@@ -6,15 +6,21 @@
                 
                 <div class="lg:col-span-2">
                     
-                    {{-- 1. Le Lecteur Vidéo --}}
+                    {{-- 1. Le Lecteur Vidéo - CORRIGÉ --}}
                     <div class="bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800 aspect-video mb-6">
                         <video 
                             controls 
                             controlsList="nodownload" 
                             poster="{{ $video->thumbnail_url }}" 
-                            class="w-full h-full object-contain focus:outline-none">
-                            {{-- CORRECTION ICI : On utilise directement l'URL sécurisée de Cloudinary avec l'auto-format --}}
-                            <source src="{{ str_replace('/upload/', '/upload/f_auto,vc_auto/', $video->video_url) }}" type="video/mp4">
+                            class="w-full h-full object-contain focus:outline-none"
+                            preload="metadata"
+                            playsinline>
+                            
+                            @if($video->video_url)
+                                {{-- Optimisation Cloudinary : f_auto (format) et vc_auto (codec) pour garantir la lecture --}}
+                                <source src="{{ str_replace('/upload/', '/upload/f_auto,vc_auto/', $video->video_url) }}" type="video/mp4">
+                            @endif
+
                             Votre navigateur ne supporte pas la lecture de vidéos.
                         </video>
                     </div>
