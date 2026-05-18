@@ -1,6 +1,6 @@
 FROM php:8.3-cli-alpine
 
-# 1. Installation des extensions minimales pour Laravel (ultra rapide sur Alpine)
+# 1. Installation des extensions minimales pour Laravel
 RUN apk add --no-cache \
     libpng-dev \
     libjpeg-turbo-dev \
@@ -24,10 +24,10 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader \
     && if [ -f package.json ]; then npm install && npm run build; fi
 
-# 4. Permissions pour Laravel
-RUN chown -R rw-data:rw-data /app/storage /app/bootstrap/cache 2>/dev/null || true
+# 4. Forcer les permissions à fond pour éviter tout blocage de cache
+RUN chmod -R 777 storage bootstrap/cache
 
 EXPOSE 8080
 
-# 5. Commande de démarrage direct sans Apache
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
+# 5. Démarrage sécurisé en nettoyant les résidus de cache à la volée
+CMD php artisan config:clear && php artisan route:clear && php artisan serve --host=0.0.0.0 --port=8080
