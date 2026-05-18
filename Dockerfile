@@ -24,10 +24,10 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader \
     && if [ -f package.json ]; then npm install && npm run build; fi
 
-# 4. Forcer les permissions à fond pour éviter tout blocage de cache
+# 4. Permissions totales
 RUN chmod -R 777 storage bootstrap/cache
 
 EXPOSE 8080
 
-# 5. Démarrage sécurisé en nettoyant les résidus de cache à la volée
-CMD php artisan config:clear && php artisan route:clear && php artisan serve --host=0.0.0.0 --port=8080
+# 5. SÉCURITÉ ABSOLUE : On lance le serveur PHP natif en ciblant directement le dossier public
+CMD ["php", "-S", "0.0.0.0:8080", "-t", "public"]
