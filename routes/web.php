@@ -10,9 +10,6 @@ use App\Http\Controllers\RatingController;
 use App\Http\Controllers\PlaylistController;
 use App\Http\Controllers\NotificationController;
 
-use App\Models\Video; // Assure-toi que le modèle s'appelle bien Video
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 
 
 // --- PARTIE ADMIN (Seulement si connecté) ---
@@ -68,7 +65,10 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/playlists/{playlist}/video/{video}', [PlaylistController::class, 'removeVideo'])->name('playlists.remove-video');
 });
 
-use Illuminate\Support\Str; // Ne pas oublier cet import pour le slug !
+use App\Models\User;
+use App\Models\Video;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 Route::get('/setup-demo-data', function () {
     try {
@@ -82,7 +82,7 @@ Route::get('/setup-demo-data', function () {
             ]
         );
 
-        // 2. Liste des 10 vidéos avec génération de slug
+        // 2. Liste des 10 vidéos
         $videos = [
             ['title' => 'Big Buck Bunny', 'url' => 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', 'description' => 'Animation classique de lapin.'],
             ['title' => 'Elephant Dream', 'url' => 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', 'description' => 'Premier projet de film ouvert avec Blender.'],
@@ -100,19 +100,16 @@ Route::get('/setup-demo-data', function () {
             Video::updateOrCreate(
                 ['title' => $video['title']],
                 [
-                    'slug' => Str::slug($video['title']), // Génère automatiquement "big-buck-bunny"
+                    'slug' => Str::slug($video['title']),
                     'description' => $video['description'],
-                    
-                    // /!\ NOTE : Si l'URL ne s'enregistre pas, remplace 'url' ci-dessous 
-                    // par le vrai nom de ta colonne (ex: 'video_url', 'path', 'link')
-                    'url' => $video['url'], 
+                    'video_url' => $video['url'], // Corrigé ici avec le bon nom de colonne !
                 ]
             );
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Super Admin et 10 vidéos avec slugs injectés avec succès !'
+            'message' => 'Super Admin et 10 vidéos injectés avec succès sur PostgreSQL !'
         ], 200);
 
     } catch (\Exception $e) {
