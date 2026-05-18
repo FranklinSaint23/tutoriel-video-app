@@ -68,6 +68,7 @@ Route::middleware(['auth'])->group(function () {
 use App\Models\User;
 use App\Models\Video;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB; // Importé pour la création rapide de catégorie
 use Illuminate\Support\Str;
 
 Route::get('/setup-demo-data', function () {
@@ -76,13 +77,26 @@ Route::get('/setup-demo-data', function () {
         User::updateOrCreate(
             ['email' => 'admin@gmail.com'],
             [
-                'name' => 'Super Admin',
+                'name' => 'admin',
                 'password' => Hash::make('admin1234'),
                 'email_verified_at' => now(),
             ]
         );
 
-        // 2. Liste des 10 vidéos
+        // 2. Création d'une catégorie par défaut si elle n'existe pas pour lier les vidéos
+        // On utilise DB::table pour parer à tout manque de modèle Category
+        $categoryId = DB::table('categories')->where('slug', 'general')->value('id');
+        
+        if (!$categoryId) {
+            $categoryId = DB::table('categories')->insertGetId([
+                'name' => 'Général',
+                'slug' => 'general',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        // 3. Liste des 10 vidéos
         $videos = [
             ['title' => 'Big Buck Bunny', 'url' => 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', 'description' => 'Animation classique de lapin.'],
             ['title' => 'Elephant Dream', 'url' => 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', 'description' => 'Premier projet de film ouvert avec Blender.'],
@@ -102,14 +116,15 @@ Route::get('/setup-demo-data', function () {
                 [
                     'slug' => Str::slug($video['title']),
                     'description' => $video['description'],
-                    'video_url' => $video['url'], // Corrigé ici avec le bon nom de colonne !
+                    'video_url' => $video['url'],
+                    'category_id' => $categoryId, // Lié ici à l'ID de la catégorie !
                 ]
             );
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Super Admin et 10 vidéos injectés avec succès sur PostgreSQL !'
+            'message' => 'Félicitations ! Admin, Catégorie et 10 vidéos injectés avec succès.'
         ], 200);
 
     } catch (\Exception $e) {
