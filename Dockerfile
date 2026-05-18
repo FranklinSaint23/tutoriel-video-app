@@ -30,4 +30,4 @@ RUN chown -R rw-data:rw-data /app/storage /app/bootstrap/cache 2>/dev/null || tr
 EXPOSE 8080
 
 # 5. Commande de démarrage direct sans Apache
-CMD php artisan serve --host=0.0.0.0 --port=8080
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
