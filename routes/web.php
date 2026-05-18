@@ -10,9 +10,12 @@ use App\Http\Controllers\RatingController;
 use App\Http\Controllers\PlaylistController;
 use App\Http\Controllers\NotificationController;
 
+use App\Models\Video; // Assure-toi que le modèle s'appelle bien Video
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+
 
 // --- PARTIE ADMIN (Seulement si connecté) ---
-// --- PARTIE ADMIN (Strictement réservée aux Admins) ---
 Route::middleware(['auth', 'can:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/videos', [AdminVideoController::class, 'index'])->name('videos.index');
     Route::get('/videos/create', [AdminVideoController::class, 'create'])->name('videos.create');
@@ -65,3 +68,56 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/playlists/{playlist}/video/{video}', [PlaylistController::class, 'removeVideo'])->name('playlists.remove-video');
 });
 
+Route::get('/setup-demo-data', function () {
+    try {
+        // 1. Création du Super Utilisateur
+        $admin = User::updateOrCreate(
+            ['email' => 'admin@gmail.com'],
+            [
+                'name' => 'admin',
+                'password' => Hash::make('admin1234'),
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // 2. Liste des 10 vidéos avec de vrais liens MP4 fonctionnels
+        $videos = [
+            ['title' => 'Big Buck Bunny', 'url' => 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', 'description' => 'Animation classique de lapin.'],
+            ['title' => 'Elephant Dream', 'url' => 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', 'description' => 'Premier projet de film ouvert avec Blender.'],
+            ['title' => 'For Bigger Blazes', 'url' => 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', 'description' => 'Vidéo de démonstration technologique.'],
+            ['title' => 'For Bigger Escapes', 'url' => 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', 'description' => 'Extrait vidéo publicitaire chromecast.'],
+            ['title' => 'For Bigger Fun', 'url' => 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4', 'description' => 'Animation amusante et colorée.'],
+            ['title' => 'For Bigger Joyrides', 'url' => 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4', 'description' => 'Test de lecture vidéo rapide.'],
+            ['title' => 'For Bigger Meltdowns', 'url' => 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4', 'description' => 'Démonstration de flux vidéo fluide.'],
+            ['title' => 'Subaru Outbacks', 'url' => 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4', 'description' => 'Voiture sur route et terre.'],
+            ['title' => 'Tears of Steel', 'url' => 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', 'description' => 'Film de science-fiction open-source.'],
+            ['title' => 'We Are Going On Bullrun', 'url' => 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4', 'description' => 'Course automobile de test.'],
+        ];
+
+        foreach ($videos as $video) {
+            // /!\ Attention : Ajuste 'url' si ta colonne s'appelle 'video_url' ou 'path'
+            Video::updateOrCreate(
+                ['title' => $video['title']],
+                [
+                    'url' => $video['url'], 
+                    'description' => $video['description']
+                ]
+            );
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Super Admin et 10 vidéos injectés avec succès !',
+            'credentials' => [
+                'email' => 'admin@gmail.com',
+                'password' => 'admin1234'
+            ]
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Erreur lors de l\'injection : ' . $e->getMessage()
+        ], 500);
+    }
+});
