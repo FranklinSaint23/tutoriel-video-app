@@ -68,19 +68,21 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/playlists/{playlist}/video/{video}', [PlaylistController::class, 'removeVideo'])->name('playlists.remove-video');
 });
 
+use Illuminate\Support\Str; // Ne pas oublier cet import pour le slug !
+
 Route::get('/setup-demo-data', function () {
     try {
         // 1. Création du Super Utilisateur
-        $admin = User::updateOrCreate(
+        User::updateOrCreate(
             ['email' => 'admin@gmail.com'],
             [
-                'name' => 'admin',
+                'name' => 'Super Admin',
                 'password' => Hash::make('admin1234'),
                 'email_verified_at' => now(),
             ]
         );
 
-        // 2. Liste des 10 vidéos avec de vrais liens MP4 fonctionnels
+        // 2. Liste des 10 vidéos avec génération de slug
         $videos = [
             ['title' => 'Big Buck Bunny', 'url' => 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', 'description' => 'Animation classique de lapin.'],
             ['title' => 'Elephant Dream', 'url' => 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', 'description' => 'Premier projet de film ouvert avec Blender.'],
@@ -95,23 +97,22 @@ Route::get('/setup-demo-data', function () {
         ];
 
         foreach ($videos as $video) {
-            // /!\ Attention : Ajuste 'url' si ta colonne s'appelle 'video_url' ou 'path'
             Video::updateOrCreate(
                 ['title' => $video['title']],
                 [
+                    'slug' => Str::slug($video['title']), // Génère automatiquement "big-buck-bunny"
+                    'description' => $video['description'],
+                    
+                    // /!\ NOTE : Si l'URL ne s'enregistre pas, remplace 'url' ci-dessous 
+                    // par le vrai nom de ta colonne (ex: 'video_url', 'path', 'link')
                     'url' => $video['url'], 
-                    'description' => $video['description']
                 ]
             );
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Super Admin et 10 vidéos injectés avec succès !',
-            'credentials' => [
-                'email' => 'admin@gmail.com',
-                'password' => 'admin1234'
-            ]
+            'message' => 'Super Admin et 10 vidéos avec slugs injectés avec succès !'
         ], 200);
 
     } catch (\Exception $e) {
